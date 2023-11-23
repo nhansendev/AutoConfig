@@ -40,15 +40,15 @@ verbose | *bool, default=False*
 > For example; if "seed: ???" and "subconfig.seed: ${seed}" then it remains "subconfig.seed: ${seed}"
 
 ### Setting/Getting
-- Any config values (including nested) can be accessed via the format "class_instance.key1.key2.key3..."
-- The class functions as an iterator ('__iter__'), yielding any attribute keys
-- ".pop(key)" removes a given key (if available) and returns its matching value
-- Supports setting values via 'class_inst["key"] = value'
-- Supports getting values via 'class_inst["key"]'
-- ".get(keys)" takes an iterable of keys and returns the value at the end of the key chain, if available
-- ".set(keys)" takes an iterable of keys and sets the value at the end of the key chain, if available
-- ".get_dict()" returns a dictionary representation of the current configuration
-- ".print()" uses DictionaryPrint to create a clean print of the data
+- Any config values (including nested) can be accessed via the format `class_instance.key1.key2.key3...`
+- The class functions as an iterator (`__iter__`), yielding any attribute keys
+- `.pop(key)` removes a given key (if available) and returns its matching value
+- Supports setting values via `class_inst["key"] = value`
+- Supports getting values via `class_inst["key"]`
+- `.get(keys)` takes an iterable of keys and returns the value at the end of the key chain, if available
+- `.set(keys)` takes an iterable of keys and sets the value at the end of the key chain, if available
+- `.get_dict()` returns a dictionary representation of the current configuration
+- `.print()` uses DictionaryPrint to create a clean print of the data
 
 
 ### Usage Example:
