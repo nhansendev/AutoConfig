@@ -1,9 +1,3 @@
-# Copyright (c) 2023, Nathan Hansen
-# All rights reserved.
-
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
-
 import os
 import yaml
 
@@ -84,15 +78,20 @@ def _get_dict_exclude(obj, exclude=["subset"]):
 
 class args_from_YAML:
     def __init__(
-        self, config_path, info=None, subset=None, printout=False, local_subsets=False
+        self,
+        config_path,
+        subset=None,
+        verbose=False,
+        _local_subsets=False,
+        _info=None,
     ):
-        if info is None:
-            # Top-level
+        if _info is None:
+            # _top-level
             self.config_path = config_path
         else:
             self.subset = subset
         self.reset(
-            subset=subset, info=info, printout=printout, local_subsets=local_subsets
+            subset=subset, _info=_info, verbose=verbose, _local_subsets=_local_subsets
         )
 
     def save_to_yaml(self, path, mode="w", exclude=["subset"]):
@@ -100,7 +99,7 @@ class args_from_YAML:
         with open(path, mode) as file:
             _write_dict(_get_dict_exclude(self, exclude), file)
 
-    def reset(self, subset="main", info=None, printout=False, local_subsets=False):
+    def reset(self, subset="main", verbose=False, _info=None, _local_subsets=False):
         # Recreate class instance with the provided kwargs
         path = None
         if hasattr(self, "config_path"):
@@ -108,22 +107,22 @@ class args_from_YAML:
         _configure(
             self,
             path,
-            info=info,
+            _info=_info,
             subset=subset,
-            printout=printout,
-            local_subsets=local_subsets,
+            verbose=verbose,
+            _local_subsets=_local_subsets,
         )
 
     def update_reuse(self, st_str="${", en_str="}"):
         # By default, any config items with the format "${name}" will be filled using a higher-level instance of "name"
         # For example; if "seed: 0" and "subconfig.seed: ${seed}" then it becomes "subconfig.seed: 0"
-        process_reuse(self, self, st_str=st_str, en_str=en_str)
+        _process_reuse(self, self, st_str=st_str, en_str=en_str)
 
     def pop(self, key, default=None):
         return self.__dict__.pop(key, default)
 
     def __iter__(self):
-        # Return the top-level attribute names via 'for key in class_inst'
+        # Return the _top-level attribute names via 'for key in class_inst'
         for key in self.__dict__.keys():
             yield key
 
@@ -169,38 +168,42 @@ def _try_float(obj):
 def _configure(
     obj,
     path=None,
-    info=None,
     subset=None,
-    printout=False,
-    local_subsets=False,
-    top=False,
+    verbose=False,
+    _info=None,
+    _local_subsets=False,
+    _top=False,
 ):
-    if info is None:
-        top = True
+    if _info is None:
+        _top = True
         with open(path, "r") as f:
-            info = yaml.safe_load(f)
+            _info = yaml.safe_load(f)
 
-    for k, v in info.items():
+    for k, v in _info.items():
         if k == "_local_":
-            local_subsets = v
+            _local_subsets = v
         if isinstance(v, dict):
-            if (k == subset and top) or not top or subset is None:
-                if local_subsets:
-                    # Add all values to the top-level class
+            if (k == subset and _top) or not _top or subset is None:
+                if _local_subsets:
+                    # Add all values to the _top-level class
                     _configure(
-                        obj, path=path, info=v, subset=None, local_subsets=local_subsets
+                        obj,
+                        path=path,
+                        _info=v,
+                        subset=None,
+                        _local_subsets=_local_subsets,
                     )
                 else:
                     # Recursively add subclasses to contain the dictionary values as needed (per the given YAML structure)
                     # Ex: A.B.C.D.value
-                    setattr(obj, k, args_from_YAML(path, info=v, subset=k))
+                    setattr(obj, k, args_from_YAML(path, _info=v, subset=k))
         else:
             setattr(obj, k, v)
 
     _try_float(obj)
-    if printout:
-        print(f"Config using: {path}, [{subset}]", end="")
-        obj.print()
+    if verbose:
+        print(f"AutoConfig using: {path}, subset: {subset}")
+        # obj.print()
 
 
 def reassign(target, source):
@@ -223,7 +226,7 @@ def _nested_set(obj, att_list, value):
         setattr(obj, att, value)
 
 
-def process_reuse(
+def _process_reuse(
     data, original_data, st_str="${", en_str="}", ignore="???", max_depth=10
 ):
     def _check_replace(v):
@@ -256,4 +259,4 @@ def process_reuse(
                     f'WARNING: AutoConfig could not find the following term for reuse: "{".".join(temp)}"'
                 )
         elif isinstance(v, args_from_YAML):
-            process_reuse(v, original_data)
+            _process_reuse(v, original_data)
