@@ -26,7 +26,7 @@ path | *str*
 > The path to the YAML file
 
 subset | *iterable of str, default=None*:
-> An iterable of subsets within the file to read, ignoring others
+> An optional iterable of keys within the file to read, ignoring others
 
 verbose | *bool, default=False*
 > Provides some info about the config being used
@@ -38,7 +38,7 @@ verbose | *bool, default=False*
 > subset(s) can optionally be specified
 
 .save_to_yaml(path, mode='w', exclude=["subset"])
-> Writes the current state of the class and its data to file
+> Writes the current state of the class and its data to a yaml file
 
 > Optionally exclude subsets
 
@@ -52,11 +52,11 @@ verbose | *bool, default=False*
 > For example; if "seed: ???" and "subconfig.seed: ${seed}" then it remains "subconfig.seed: ${seed}"
 
 ### Setting/Getting
-- Any config values (including nested) can be accessed via the format `class_instance.key1.key2.key3...`
-- The class functions as an iterator (`__iter__`), yielding any attribute keys
+- Any config values (including nested) can be accessed via the format `class_instance.key1.key2.key3`
+- The class functions as an iterator (`__iter__`), yielding any keys
 - `.pop(key)` removes a given key (if available) and returns its matching value
-- Supports setting values via `class_inst["key"] = value`
-- Supports getting values via `class_inst["key"]`
+- Supports setting values via `class_inst["key"] = value`, including nested values `class_inst["key"]["key2"]["key3"] = value`
+- Supports getting values via `class_inst["key"]`, including nested values `class_inst["key"]["key2"]["key3"]`
 - `.get(keys)` takes an iterable of keys and returns the value at the end of the key chain, if available
 - `.set(keys)` takes an iterable of keys and sets the value at the end of the key chain, if available
 - `.get_dict()` returns a dictionary representation of the current configuration
@@ -69,13 +69,17 @@ verbose | *bool, default=False*
     
     A = args_from_YAML(<config file path>, verbose=True)
     A.update_reuse()
-    A.print()
     
     print(A.STE_cfg.noise_penalty)
     print(A["DAAC_cfg"]["clip_param"])
+    
+    A.print()
 
 ### Result:
     AutoConfig using: /home/user/Desktop/example.yaml, subset: None
+    
+    0.001
+    0.2
 
     config_path: /home/user/Desktop/example.yaml
     ______ seed: 0
@@ -134,8 +138,6 @@ verbose | *bool, default=False*
                > use_nonlinear_clf: False
                > _ clf_hidden_size: 4
     
-    0.001
-    0.2
 
 ## > reassign(target, source)
 A simple function for copying key:value attributes from one object to another
