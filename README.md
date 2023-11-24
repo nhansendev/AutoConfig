@@ -145,6 +145,8 @@ A simple function for copying key:value attributes from one object to another
 Useful for loading your config into a class without passing everything as kwargs
 
 ### Example Usage:
+    from AutoConfig import reassign
+
     my_class = dummy_class()
     
     A = args_from_YAML(path)
