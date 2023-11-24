@@ -1,5 +1,5 @@
 # AutoConfig
-A python utility for reading custom YAML configuration files
+A python utility for reading/writing custom YAML configuration files
 
 # Requirements
 - pyyaml
