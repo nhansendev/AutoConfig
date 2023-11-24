@@ -7,6 +7,18 @@ A python utility for reading custom YAML configuration files
 - Python 3.6+ (not tested with earlier versions)
 
 # Usage
+## YAML file formatting (see included example.yaml)
+- All config info exists as key:value pairs, which can be nested using indentation
+- Recognizes:
+    - floats/ints
+    - lists of values: `[0.1, -1.1, 3]` etc.
+    - scientific notation: `1.1e-5`
+    - `None`: specified as `null`
+    - Setting placeholders for later update: `norm: ${norm}` (see `.update_reuse`)
+    - booleans
+    - Everything is a string otherwise
+- Python comments are ignored: `# like this`
+
 ## args_from_YAML
 The main class for reading/writing/printing from YAML config files
 ### Configuration:
