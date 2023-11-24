@@ -7,7 +7,7 @@ A python utility for reading custom YAML configuration files
 - Python 3.6+ (not tested with earlier versions)
 
 # Usage
-## YAML file formatting (see included example.yaml)
+## > YAML file formatting (see included example.yaml)
 - All config info exists as key:value pairs, which can be nested using indentation
 - Recognizes:
     - floats/ints
@@ -19,7 +19,7 @@ A python utility for reading custom YAML configuration files
     - Everything is a string otherwise
 - Python comments are ignored: `# like this`
 
-## args_from_YAML
+## > args_from_YAML
 The main class for reading/writing/printing from YAML config files
 ### Configuration:
 path | *str*
@@ -136,3 +136,19 @@ verbose | *bool, default=False*
     
     0.001
     0.2
+
+## > reassign(target, source)
+A simple function for copying key:value attributes from one object to another
+
+Useful for loading your config into a class without passing everything as kwargs
+
+### Example Usage:
+    my_class = dummy_class()
+    
+    A = args_from_YAML(path)
+    print(A.save_path) # exists
+    
+    print(my_class.save_path) # does not exist
+    
+    reassign(my_class, A) # copy config info into "my_class"
+    print(my_class.save_path) # exists
