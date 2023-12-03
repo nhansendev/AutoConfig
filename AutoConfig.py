@@ -1,13 +1,6 @@
 import os
 import yaml
-
-try:
-    from dict_print import dict_print
-except ModuleNotFoundError:
-    dict_print = print
-    print(
-        'Warning: "dict_print" module not found. It is recommended for clean printing. https://github.com/nhansendev/DictionaryPrint'
-    )
+from dict_print import dict_print
 
 
 def argparse_to_YAML(parser, destination, filename="config.yaml"):
