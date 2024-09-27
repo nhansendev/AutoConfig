@@ -8,10 +8,16 @@ A python utility for reading/writing custom YAML configuration files
 
 # Installation
 From within the AutoConfig folder:
-``` pip install . ```
+
+```
+pip install .
+```
 
 To uninstall:
-``` pip uninstall AutoConfig ```
+
+```
+pip uninstall AutoConfig
+```
 
 # Usage
 ## > YAML file formatting (see included example.yaml)
