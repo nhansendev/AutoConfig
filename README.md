@@ -3,7 +3,6 @@ A python utility for reading/writing custom YAML configuration files
 
 # Requirements
 - pyyaml
-- DictionaryPrint (https://github.com/nhansendev/DictionaryPrint)
 - Python 3.6+ (not tested with earlier versions)
 
 # Installation
