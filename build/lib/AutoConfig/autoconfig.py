@@ -2,54 +2,6 @@ import yaml
 from .dict_print import dict_print
 
 
-# def argparse_to_YAML(parser, destination, filename="config.yaml"):
-#     """Write a YAML file based on the current state of the arg parser
-
-#     Parameters
-#     ----------
-#     parser : args_from_YAML
-#         The parser to read attributes from
-#     destination : str
-#         The directory to write the YAML file into
-#     filename : str
-#         The name of the YAML file, including .yaml extension
-#     """
-
-#     if not os.path.exists(destination):
-#         raise FileNotFoundError(destination)
-
-#     lines = []
-#     choices = []
-#     for act in parser._actions:
-#         # ignore the help action
-#         if act.default != "==SUPPRESS==":
-#             lines.append(
-#                 [
-#                     f'{act.dest}: {act.default if act.default is not None else "null"}',
-#                     f"# {act.help}\n",
-#                 ]
-#             )
-#             if act.choices is not None:
-#                 choices.append(
-#                     f"# {act.dest} choices:\n  # "
-#                     + "\n  # ".join([str(a) for a in act.choices])
-#                     + "\n"
-#                 )
-#             else:
-#                 choices.append(None)
-
-#     longest = max([len(line[0]) for line in lines])
-
-#     path = os.path.join(destination, filename)
-#     with open(path, "w") as file:
-#         for line, choice in zip(lines, choices):
-#             file.write(line[0] + (longest + 2 - len(line[0])) * " " + line[1])
-#             if choice is not None:
-#                 file.write(choice)
-
-#     print(f"YAML file written to: {path}")
-
-
 def _type_conv(val):
     """Convert None to 'null'"""
     return "null" if val is None else val
@@ -107,6 +59,59 @@ def _get_dict_exclude(obj, exclude=["subset"]):
                 # Use recursion if needed
                 temp[k] = _get_dict_exclude(v, exclude=exclude)
     return temp
+
+
+def compare_args(argsA, argsB, _top_level=True, _post=""):
+    dA = argsA.get_kwargs()
+    dB = argsB.get_kwargs()
+
+    keyA = set(dA.keys())
+    keyB = set(dB.keys())
+
+    uniques = keyA.union(keyB)
+    b_missing = keyA - keyB
+    b_only = keyB - keyA
+
+    B_only = {k: argsB[k] for k in b_only}
+    B_missing = {k: argsA[k] for k in b_missing}
+
+    both_have_diff = {}
+    for u in uniques:
+        try:
+            if argsA[u] != argsB[u]:
+                if isinstance(argsA[u], args_from_YAML):
+                    tmp = compare_args(argsA[u], argsB[u], False, _post + "." + u)
+                    both_have_diff.update(tmp)
+                else:
+                    both_have_diff[u + _post] = f"{argsA[u]} | {argsB[u]}"
+        except AttributeError:
+            continue
+
+    if not _top_level:
+        return both_have_diff
+
+    any_diff = False
+    if len(B_missing) > 0:
+        print("===== Missing from B =====")
+        dict_print(B_missing)
+        any_diff = True
+
+    if len(B_only) > 0:
+        print("===== Only in B =====")
+        dict_print(B_only)
+        any_diff = True
+
+    if len(both_have_diff) > 0:
+        print("===== Different <A | B> =====")
+        dict_print(both_have_diff)
+        any_diff = True
+
+    if not any_diff:
+        print("No differences found.")
+
+
+def compare_yaml(fileA, fileB):
+    compare_args(args_from_YAML(fileA), args_from_YAML(fileB))
 
 
 class args_from_YAML:
@@ -207,6 +212,9 @@ class args_from_YAML:
         """For pretty printing of the parser's attributes and values"""
         dict_print(_get_dict_exclude(self))
         print()
+
+    def __str__(self) -> str:
+        return f"{_get_dict_exclude(self)}"
 
 
 def _try_float(obj):

@@ -1,6 +1,9 @@
 LICENSE
 README.md
 setup.py
+AutoConfig/__init__.py
+AutoConfig/autoconfig.py
+AutoConfig/dict_print.py
 AutoConfig.egg-info/PKG-INFO
 AutoConfig.egg-info/SOURCES.txt
 AutoConfig.egg-info/dependency_links.txt
