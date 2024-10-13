@@ -62,6 +62,15 @@ def _get_dict_exclude(obj, exclude=["subset"]):
 
 
 def compare_args(argsA, argsB, _top_level=True, _post=""):
+    """Compare two args_from_YAML instances, printing the differences
+
+    Parameters
+    ----------
+    argsA : args_from_YAML
+        The base instance to compare against
+    argsB : args_from_YAML
+        The other instance to compare
+    """
     dA = argsA.get_kwargs()
     dB = argsB.get_kwargs()
 
@@ -111,6 +120,15 @@ def compare_args(argsA, argsB, _top_level=True, _post=""):
 
 
 def compare_yaml(fileA, fileB):
+    """Compare two YAML files, printing the differences
+
+    Parameters
+    ----------
+    fileA : str
+        The filepath to a YAML file to compare
+    fileB : str
+        The filepath to another YAML file to compare
+    """
     compare_args(args_from_YAML(fileA), args_from_YAML(fileB))
 
 
@@ -224,9 +242,13 @@ def _try_float(obj):
         if isinstance(v, str):
             try:
                 tmp = float(v)
-                if int(tmp) - tmp == 0:
-                    # If equivalent to integer then, assume int
-                    tmp = int(tmp)
+                try:
+                    if int(tmp) - tmp == 0:
+                        # If equivalent to integer then, assume int
+                        tmp = int(tmp)
+                except OverflowError:
+                    # Can't convert inf float to integer
+                    pass
                 obj[k] = tmp
             except ValueError:
                 # Can't convert to float, so ignore it

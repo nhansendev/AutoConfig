@@ -242,9 +242,13 @@ def _try_float(obj):
         if isinstance(v, str):
             try:
                 tmp = float(v)
-                if int(tmp) - tmp == 0:
-                    # If equivalent to integer then, assume int
-                    tmp = int(tmp)
+                try:
+                    if int(tmp) - tmp == 0:
+                        # If equivalent to integer then, assume int
+                        tmp = int(tmp)
+                except OverflowError:
+                    # Can't convert inf float to integer
+                    pass
                 obj[k] = tmp
             except ValueError:
                 # Can't convert to float, so ignore it
